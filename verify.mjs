@@ -6,6 +6,7 @@ const sandbox={console,document,performance:{now:()=>100},localStorage:{getItem:
 vm.createContext(sandbox);vm.runInContext(fs.readFileSync('app.js','utf8'),sandbox);
 vm.runInContext(`
 if(!points.length||!Number.isFinite(scale))throw Error('layout');
+const moving=points[0];for(let t=0;t<20000;t+=100){const at=floatingPosition(moving,t);if(Math.abs(at.x-moving.x)>3.001||Math.abs(at.y-moving.y)>3.001)throw Error('motion bounds')}const at0=floatingPosition(moving,0),at1=floatingPosition(moving,2000);if(at0.x===at1.x&&at0.y===at1.y)throw Error('no motion');draw(2000);const target={x:moving.displayX,y:moving.displayY};hit(target,target);if(!moving.done)throw Error('moving hit');const settled=floatingPosition(moving,4000);if(settled.x!==moving.x||settled.y!==moving.y)throw Error('cloud not settled');nextLetter();
 const p=points[0];hit(p,p);const n=state.done.length;hit(p,p);if(!p.done||state.done.length!==n)throw Error('tap');
 paused=true;const q=points[1];hit(q,q);if(q.done)throw Error('pause');paused=false;
 const before=state.letter;nextLetter();if(state.letter===before||state.done.length)throw Error('next');
