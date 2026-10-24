@@ -1,9 +1,9 @@
 'use strict';
 const $=s=>document.querySelector(s), canvas=$('#board'),ctx=canvas.getContext('2d');
 const KANA=[...'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん'];
-const NAMES={balloon:'ふうせん',bee:'はち',butterfly:'ちょうちょ'};
+const NAMES={balloon:'ふうせん',bee:'はち',butterfly:'ちょうちょ',ladybug:'てんとうむし',beetle:'かぶとむし'};
 let saved;try{saved=JSON.parse(localStorage.getItem('potsupotsu-v2'))}catch{}
-let state={letter:KANA[Math.floor(Math.random()*KANA.length)],theme:Object.keys(NAMES)[Math.floor(Math.random()*3)],bag:[],done:[],...saved,density:'normal',motion:'on'};
+let state={letter:KANA[Math.floor(Math.random()*KANA.length)],theme:Object.keys(NAMES)[Math.floor(Math.random()*Object.keys(NAMES).length)],bag:[],done:[],...saved,density:'normal',motion:'on'};
 if(!KANA.includes(state.letter))state.letter='あ';
 if(!NAMES[state.theme])state.theme='balloon';
 if(!Array.isArray(state.bag))state.bag=[];
@@ -21,6 +21,8 @@ function icon(p,r,t){const pos=floatingPosition(p,t);p.displayX=pos.x;p.displayY
 ctx.save();ctx.translate(x,y);
 if(state.theme==='balloon'){ctx.strokeStyle='#765068';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(0,r*.8);ctx.quadraticCurveTo(-4,r*1.05,1,r*1.2);ctx.stroke();const colors=['#e76671','#e9b43e','#a36ac4'];ctx.fillStyle=colors[Math.abs(Math.round(p.x+p.y))%3];ctx.beginPath();ctx.ellipse(0,-2,r*.7,r*.84,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#874c68';ctx.lineWidth=.9;ctx.stroke();ctx.beginPath();ctx.moveTo(0,r*.6);ctx.lineTo(-3,r*.85);ctx.lineTo(3,r*.85);ctx.fill();ctx.strokeStyle='#ffffff80';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(-r*.26,-r*.3,2,r*.23,.3,0,Math.PI*2);ctx.stroke()}
 else if(state.theme==='bee'){drawBee(r)}
+else if(state.theme==='ladybug'){drawLadybug(r)}
+else if(state.theme==='beetle'){drawBeetle(r)}
 else{
 for(const d of [-1,1]){
 ctx.fillStyle='#f3de63';ctx.strokeStyle='#826b3c';ctx.lineWidth=1.05;
@@ -31,6 +33,32 @@ ctx.fillStyle='#fff4c4';ctx.beginPath();ctx.ellipse(d*r*.48,-r*.28,r*.15,r*.32,d
 ctx.strokeStyle='#74613a';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,-r*.6);ctx.lineTo(0,r*.65);ctx.stroke();
 ctx.lineWidth=1;for(const d of [-1,1]){ctx.beginPath();ctx.moveTo(0,-r*.5);ctx.quadraticCurveTo(d*r*.12,-r*.83,d*r*.25,-r*.84);ctx.stroke()}
 }ctx.restore()}
+function drawLadybug(r){
+ctx.save();ctx.scale(r,r);ctx.lineCap='round';ctx.lineJoin='round';
+ctx.strokeStyle='#414039';ctx.lineWidth=.07;
+for(const side of [-1,1])for(let i=0;i<3;i++){const y=-.3+i*.3;ctx.beginPath();ctx.moveTo(side*.45,y);ctx.lineTo(side*.74,y+.08);ctx.lineTo(side*.85,y-.02);ctx.stroke()}
+ctx.fillStyle='#393b35';ctx.beginPath();ctx.ellipse(0,-.58,.32,.29,0,0,Math.PI*2);ctx.fill();
+ctx.lineWidth=.045;for(const d of [-1,1]){ctx.beginPath();ctx.moveTo(d*.15,-.72);ctx.quadraticCurveTo(d*.23,-.95,d*.39,-.94);ctx.stroke()}
+ctx.fillStyle='#db5547';ctx.strokeStyle='#843f36';ctx.lineWidth=.055;ctx.beginPath();ctx.ellipse(0,.08,.65,.73,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+ctx.strokeStyle='#633b32';ctx.lineWidth=.045;ctx.beginPath();ctx.moveTo(0,-.64);ctx.lineTo(0,.8);ctx.stroke();
+ctx.fillStyle='#383b34';for(const [x,y,rr]of [[-.27,-.28,.12],[.27,-.28,.12],[-.36,.15,.14],[.36,.15,.14],[-.23,.50,.11],[.23,.50,.11]]){ctx.beginPath();ctx.arc(x,y,rr,0,Math.PI*2);ctx.fill()}
+ctx.fillStyle='rgba(255,237,198,.55)';ctx.beginPath();ctx.ellipse(-.38,-.25,.065,.16,.5,0,Math.PI*2);ctx.fill();ctx.restore()
+}
+function drawBeetle(r){
+ctx.save();ctx.scale(r,r);ctx.lineCap='round';ctx.lineJoin='round';
+ctx.strokeStyle='#604630';ctx.lineWidth=.075;
+for(const side of [-1,1])for(let i=0;i<3;i++){const y=-.27+i*.34;ctx.beginPath();ctx.moveTo(side*.35,y);ctx.lineTo(side*.64,y+.08);ctx.lineTo(side*.79,y-.07);ctx.stroke()}
+ctx.fillStyle='#815332';ctx.strokeStyle='#523b2a';ctx.lineWidth=.05;ctx.beginPath();ctx.ellipse(0,.26,.48,.62,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+ctx.fillStyle='#a06c42';ctx.beginPath();ctx.ellipse(-.14,.20,.20,.46,-.1,0,Math.PI*2);ctx.fill();
+ctx.strokeStyle='#593c29';ctx.lineWidth=.045;ctx.beginPath();ctx.moveTo(0,-.28);ctx.lineTo(0,.85);ctx.stroke();
+ctx.fillStyle='#69472e';ctx.beginPath();ctx.ellipse(0,-.30,.42,.29,0,0,Math.PI*2);ctx.fill();
+ctx.fillStyle='#95653d';ctx.beginPath();ctx.ellipse(-.09,-.37,.23,.11,-.2,0,Math.PI*2);ctx.fill();
+ctx.fillStyle='#533c2b';ctx.beginPath();ctx.ellipse(0,-.52,.25,.21,0,0,Math.PI*2);ctx.fill();
+// Broad forked horn makes the silhouette readable even at a small size.
+ctx.strokeStyle='#62452c';ctx.lineWidth=.14;ctx.beginPath();ctx.moveTo(0,-.55);ctx.quadraticCurveTo(.08,-.78,.02,-.96);ctx.stroke();
+ctx.lineWidth=.10;ctx.beginPath();ctx.moveTo(.02,-.92);ctx.lineTo(-.13,-1.07);ctx.moveTo(.02,-.92);ctx.lineTo(.18,-1.06);ctx.stroke();
+ctx.fillStyle='#e9cf98';for(const d of [-1,1]){ctx.beginPath();ctx.arc(d*.19,-.54,.027,0,Math.PI*2);ctx.fill()}ctx.restore()
+}
 // A softly illustrated honeybee, drawn in normalized coordinates.
 function drawBee(r){
 ctx.save();ctx.scale(r,r);ctx.lineCap='round';ctx.lineJoin='round';
