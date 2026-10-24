@@ -11,7 +11,7 @@ const p=points[0];hit(p,p);const n=state.done.length;hit(p,p);if(!p.done||state.
 paused=true;const q=points[1];hit(q,q);if(q.done)throw Error('pause');paused=false;
 const before=state.letter;nextLetter();if(state.letter===before||state.done.length)throw Error('next');
 const seen=new Set([state.letter]);for(let i=0;i<43;i++){nextLetter();if(seen.has(state.letter))throw Error('repeat');seen.add(state.letter)}
-if(!NAMES[state.theme])throw Error('theme');state.theme='bee';draw(2500);
+if(!NAMES[state.theme])throw Error('theme');state.theme='bee';draw(2500);state.theme='butterfly';draw(2600);
 for(const p of points)hit(p,p);if(advanceTimer===null)throw Error('completion timer');sync();
 `,sandbox);
 assert.equal(timers.size,1);document.hidden=true;listeners.visibilitychange();assert.equal(timers.size,0);document.hidden=false;listeners.visibilitychange();assert.equal(timers.size,1);const f=[...timers.values()][0];timers.clear();f();assert.equal(timers.size,0);

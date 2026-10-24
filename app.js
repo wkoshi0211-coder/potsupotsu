@@ -21,7 +21,17 @@ function icon(p,r,t){const pos=floatingPosition(p,t);p.displayX=pos.x;p.displayY
 ctx.save();ctx.translate(x,y);
 if(state.theme==='balloon'){ctx.strokeStyle='#ddcda4';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(0,r*.8);ctx.quadraticCurveTo(-4,r*1.05,1,r*1.2);ctx.stroke();const colors=['#e6aa80','#e6c16e','#a6c8ba'];ctx.fillStyle=colors[Math.abs(Math.round(p.x+p.y))%3];ctx.beginPath();ctx.ellipse(0,-2,r*.7,r*.84,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(0,r*.6);ctx.lineTo(-3,r*.85);ctx.lineTo(3,r*.85);ctx.fill();ctx.strokeStyle='#ffffff80';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(-r*.26,-r*.3,2,r*.23,.3,0,Math.PI*2);ctx.stroke()}
 else if(state.theme==='bee'){drawBee(r)}
-else{for(const d of [-1,1]){ctx.fillStyle=d<0?'#c3b4db':'#d6c3e4';ctx.beginPath();ctx.ellipse(d*r*.43,-r*.3,r*.49,r*.68,d*.45,0,Math.PI*2);ctx.fill();ctx.fillStyle='#a6c7cd';ctx.beginPath();ctx.ellipse(d*r*.34,r*.4,r*.38,r*.43,-d*.4,0,Math.PI*2);ctx.fill()}ctx.strokeStyle='#435b64';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,-r*.6);ctx.lineTo(0,r*.65);ctx.stroke()}ctx.restore()}
+else{
+for(const d of [-1,1]){
+ctx.fillStyle=d<0?'#a253a2':'#bd5b91';ctx.strokeStyle='#66356f';ctx.lineWidth=1.05;
+ctx.beginPath();ctx.ellipse(d*r*.43,-r*.3,r*.49,r*.68,d*.45,0,Math.PI*2);ctx.fill();ctx.stroke();
+ctx.fillStyle=d<0?'#be6b9e':'#a967ac';ctx.beginPath();ctx.ellipse(d*r*.34,r*.4,r*.38,r*.43,-d*.4,0,Math.PI*2);ctx.fill();ctx.stroke();
+ctx.fillStyle='#f5dfb1';ctx.beginPath();ctx.ellipse(d*r*.53,-r*.38,r*.13,r*.24,d*.45,0,Math.PI*2);ctx.fill();
+ctx.beginPath();ctx.arc(d*r*.40,r*.42,r*.10,0,Math.PI*2);ctx.fill();
+}
+ctx.strokeStyle='#513651';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,-r*.6);ctx.lineTo(0,r*.65);ctx.stroke();
+ctx.lineWidth=1;for(const d of [-1,1]){ctx.beginPath();ctx.moveTo(0,-r*.5);ctx.quadraticCurveTo(d*r*.12,-r*.83,d*r*.25,-r*.84);ctx.stroke()}
+}ctx.restore()}
 // A softly illustrated honeybee, drawn in normalized coordinates.
 function drawBee(r){
 ctx.save();ctx.scale(r,r);ctx.lineCap='round';ctx.lineJoin='round';
