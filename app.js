@@ -23,13 +23,12 @@ if(state.theme==='balloon'){ctx.strokeStyle='#765068';ctx.lineWidth=1.2;ctx.begi
 else if(state.theme==='bee'){drawBee(r)}
 else{
 for(const d of [-1,1]){
-ctx.fillStyle=d<0?'#a253a2':'#bd5b91';ctx.strokeStyle='#66356f';ctx.lineWidth=1.05;
+ctx.fillStyle='#f3de63';ctx.strokeStyle='#826b3c';ctx.lineWidth=1.05;
 ctx.beginPath();ctx.ellipse(d*r*.43,-r*.3,r*.49,r*.68,d*.45,0,Math.PI*2);ctx.fill();ctx.stroke();
-ctx.fillStyle=d<0?'#be6b9e':'#a967ac';ctx.beginPath();ctx.ellipse(d*r*.34,r*.4,r*.38,r*.43,-d*.4,0,Math.PI*2);ctx.fill();ctx.stroke();
-ctx.fillStyle='#f5dfb1';ctx.beginPath();ctx.ellipse(d*r*.53,-r*.38,r*.13,r*.24,d*.45,0,Math.PI*2);ctx.fill();
-ctx.beginPath();ctx.arc(d*r*.40,r*.42,r*.10,0,Math.PI*2);ctx.fill();
+ctx.fillStyle='#f7e994';ctx.beginPath();ctx.ellipse(d*r*.34,r*.4,r*.38,r*.43,-d*.4,0,Math.PI*2);ctx.fill();ctx.stroke();
+ctx.fillStyle='#fff4c4';ctx.beginPath();ctx.ellipse(d*r*.48,-r*.28,r*.15,r*.32,d*.45,0,Math.PI*2);ctx.fill();
 }
-ctx.strokeStyle='#513651';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,-r*.6);ctx.lineTo(0,r*.65);ctx.stroke();
+ctx.strokeStyle='#74613a';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,-r*.6);ctx.lineTo(0,r*.65);ctx.stroke();
 ctx.lineWidth=1;for(const d of [-1,1]){ctx.beginPath();ctx.moveTo(0,-r*.5);ctx.quadraticCurveTo(d*r*.12,-r*.83,d*r*.25,-r*.84);ctx.stroke()}
 }ctx.restore()}
 // A softly illustrated honeybee, drawn in normalized coordinates.
