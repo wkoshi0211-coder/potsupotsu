@@ -20,8 +20,48 @@ function floatingPosition(p,t){if(p.done||reduced.matches)return{x:p.x,y:p.y};re
 function icon(p,r,t){const pos=floatingPosition(p,t);p.displayX=pos.x;p.displayY=pos.y;const x=pos.x,y=pos.y;if(p.done){cloud(x,y,r*.94);if(p.at&&t-p.at<280&&state.motion==='on'&&!reduced.matches){const f=(t-p.at)/280;ctx.strokeStyle='rgba(255,242,192,'+(1-f)+')';ctx.lineWidth=1.6;for(let i=0;i<5;i++){const a=i*Math.PI*2/5;ctx.beginPath();ctx.moveTo(x+Math.cos(a)*r*(1+f),y+Math.sin(a)*r*(1+f));ctx.lineTo(x+Math.cos(a)*r*(1.25+f),y+Math.sin(a)*r*(1.25+f));ctx.stroke()}}return}
 ctx.save();ctx.translate(x,y);
 if(state.theme==='balloon'){ctx.strokeStyle='#ddcda4';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(0,r*.8);ctx.quadraticCurveTo(-4,r*1.05,1,r*1.2);ctx.stroke();const colors=['#e6aa80','#e6c16e','#a6c8ba'];ctx.fillStyle=colors[Math.abs(Math.round(p.x+p.y))%3];ctx.beginPath();ctx.ellipse(0,-2,r*.7,r*.84,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(0,r*.6);ctx.lineTo(-3,r*.85);ctx.lineTo(3,r*.85);ctx.fill();ctx.strokeStyle='#ffffff80';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(-r*.26,-r*.3,2,r*.23,.3,0,Math.PI*2);ctx.stroke()}
-else if(state.theme==='bee'){ctx.fillStyle='#d9ebea';for(const d of [-1,1]){ctx.beginPath();ctx.ellipse(d*r*.4,-r*.5,r*.38,r*.52,d*.5,0,Math.PI*2);ctx.fill()}ctx.save();ctx.beginPath();ctx.ellipse(0,2,r*.78,r*.52,0,0,Math.PI*2);ctx.clip();ctx.fillStyle='#e9c66d';ctx.fillRect(-r,-r,2*r,2*r);ctx.fillStyle='#485752';ctx.fillRect(-r*.32,-r,3,2*r);ctx.fillRect(r*.12,-r,3,2*r);ctx.restore();ctx.fillStyle='#344b4c';ctx.beginPath();ctx.arc(r*.62,0,r*.3,0,Math.PI*2);ctx.fill()}
+else if(state.theme==='bee'){drawBee(r)}
 else{for(const d of [-1,1]){ctx.fillStyle=d<0?'#c3b4db':'#d6c3e4';ctx.beginPath();ctx.ellipse(d*r*.43,-r*.3,r*.49,r*.68,d*.45,0,Math.PI*2);ctx.fill();ctx.fillStyle='#a6c7cd';ctx.beginPath();ctx.ellipse(d*r*.34,r*.4,r*.38,r*.43,-d*.4,0,Math.PI*2);ctx.fill()}ctx.strokeStyle='#435b64';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,-r*.6);ctx.lineTo(0,r*.65);ctx.stroke()}ctx.restore()}
+// A softly illustrated honeybee, drawn in normalized coordinates.
+function drawBee(r){
+ctx.save();ctx.scale(r,r);ctx.lineCap='round';ctx.lineJoin='round';
+const ellipse=(x,y,rx,ry,angle,fill)=>{ctx.fillStyle=fill;ctx.beginPath();ctx.ellipse(x,y,rx,ry,angle,0,Math.PI*2);ctx.fill()};
+const line=(coords,color,width)=>{ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(coords[0],coords[1]);for(let i=2;i<coords.length;i+=2)ctx.lineTo(coords[i],coords[i+1]);ctx.stroke()};
+// Six short bent legs, behind the body.
+for(const side of [-1,1])for(let i=0;i<3;i++){
+const x=-.31+i*.24;line([x,.1*side,x-.1,.43*side,x-.24,.64*side],'#66503a',.052);
+}
+// Two pairs of translucent wings, with a restrained edge and vein.
+for(const [x,y,rx,ry,angle]of [[-.16,-.45,.27,.49,-.58],[-.44,-.28,.23,.36,-.9]]){
+ellipse(x,y,rx,ry,angle,'rgba(220,241,239,.88)');
+ctx.strokeStyle='rgba(250,255,255,.65)';ctx.lineWidth=.035;ctx.stroke();
+line([.02,-.08,x-.08,y-.2],'rgba(143,186,186,.65)',.025);
+}
+// Tapered gold abdomen and rounded dark bands.
+ctx.save();ctx.beginPath();ctx.ellipse(-.36,.1,.59,.37,.12,0,Math.PI*2);ctx.clip();
+ellipse(-.36,.1,.59,.37,.12,'#e5ad42');
+ellipse(-.39,-.02,.54,.24,.12,'#f3cb65');
+for(const x of [-.64,-.34,-.04]){
+ctx.strokeStyle='#514536';ctx.lineWidth=.13;ctx.beginPath();
+ctx.moveTo(x,-.35);ctx.quadraticCurveTo(x+.16,.08,x-.05,.55);ctx.stroke();
+}
+ctx.restore();
+// Soft overlapping shapes suggest the thorax's down without photorealistic hairs.
+ellipse(.14,.03,.31,.32,-.15,'#b98536');
+for(const [x,y]of [[-.03,-.17],[.13,-.23],[.27,-.15],[.02,.2],[.2,.23]])ellipse(x,y,.105,.10,0,'#c79b4a');
+ellipse(.13,-.02,.24,.24,0,'#d9b365');
+ellipse(.11,-.10,.18,.12,-.3,'#e4c981');
+// Distinct head, two antennae and a small glossy eye; no stinger or cartoon face.
+line([.52,-.16,.51,-.44,.39,-.52],'#544737',.045);
+line([.65,-.12,.77,-.36,.88,-.39],'#544737',.045);
+ellipse(.39,-.52,.04,.04,0,'#544737');ellipse(.88,-.39,.04,.04,0,'#544737');
+ellipse(.60,.015,.26,.255,-.22,'#584b39');
+ellipse(.59,-.085,.19,.12,-.3,'#726248');
+ellipse(.73,-.02,.065,.09,-.2,'#242f2d');
+ellipse(.745,-.045,.019,.026,0,'#f7f5dd');
+line([.79,.12,.90,.17],'#6f5a3b',.035);
+ctx.restore();
+}
 function draw(t=performance.now()){frame=0;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);ctx.clearRect(0,0,W,H);ctx.save();ctx.translate(offsetX,offsetY);ctx.scale(scale,scale);ctx.fillStyle='#ffffff03';ctx.font='500 475px "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(state.letter,0,10);const r=(state.density==='fine'?24:31)*.46;let anim=false;for(const p of points){icon(p,r,t);if((!p.done&&!reduced.matches)||(p.at&&t-p.at<300))anim=true}if(points.length&&points.every(p=>p.done)){ctx.fillStyle='#fffdf6';ctx.fillText(state.letter,0,10)}ctx.restore();if(anim&&!paused)requestDraw()}
 function requestDraw(){if(!frame)frame=requestAnimationFrame(draw)}
 function resize(){const box=canvas.getBoundingClientRect();W=box.width;H=box.height;canvas.width=Math.round(W*devicePixelRatio);canvas.height=Math.round(H*devicePixelRatio);const xs=points.map(p=>p.x),ys=points.map(p=>p.y);const left=Math.min(...xs)-22,right=Math.max(...xs)+22,top=Math.min(...ys)-22,bottom=Math.max(...ys)+22;scale=Math.min((W-36)/(right-left),(H-36)/(bottom-top));offsetX=W/2-(left+right)/2*scale;offsetY=H/2-(top+bottom)/2*scale;requestDraw()}
