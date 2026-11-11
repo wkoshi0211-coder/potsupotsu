@@ -118,8 +118,16 @@ function createBugScene(){
  let insects=[],kind='ant',elapsed=0,clock=null,previousKind=null,running=false;
  let remaining=0, bag=[];
  const names={ant:'アリ',ladybug:'てんとう虫',spider:'蜘蛛',grasshopper:'バッタ',dragonfly:'トンボ',mantis:'カマキリ',pillbug:'ダンゴムシ',caterpillar:'青虫'};
- const lengths={grasshopper:.08,dragonfly:.09,mantis:.10,pillbug:.06,caterpillar:.09};
- function size(a){return lengths[kind]?Math.min(W,H)*lengths[kind]/56:a.scale;}
+ const newKinds=new Set(['grasshopper','dragonfly','mantis','pillbug','caterpillar']);
+ // Body length as a fraction of the shorter screen edge, excluding legs and wings.
+ const bodySizes={
+  ant:[.042,49],ladybug:[.05,49],pillbug:[.062,57],spider:[.069,44],
+  grasshopper:[.088,58],caterpillar:[.098,61],dragonfly:[.112,57],mantis:[.125,58]
+ };
+ function size(a){
+  const [fraction,modelLength]=bodySizes[kind];
+  return Math.min(W,H)*fraction/modelLength*a.scale;
+ }
  function beginBatch(){remaining=2+Math.floor(Math.random()*2);start();}
  function finish(){if(--remaining>0){start();return;}running=false;clock=null;sync();requestDraw();}
 
@@ -127,7 +135,7 @@ function createBugScene(){
 function line(points,width,color){ctx.beginPath();ctx.moveTo(...points[0]);for(let i=1;i<points.length;i++)ctx.lineTo(...points[i]);ctx.lineWidth=width;ctx.strokeStyle=color;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();}
 function body(x,y,rx,ry){const g=ctx.createRadialGradient(x-rx*.32,y-ry*.35,1,x,y,Math.max(rx,ry));g.addColorStop(0,'#625143');g.addColorStop(.35,'#30271f');g.addColorStop(1,'#151411');ellipse(x,y,rx,ry,g);ellipse(x-rx*.2,y-ry*.35,rx*.38,ry*.16,'rgba(255,226,184,.14)',-.2);}
 
- function drawAnt(a,t){if(a.dead&&a.age>1.6)return;ctx.save();ctx.translate(a.x,a.y);ctx.rotate(a.angle);ctx.scale(a.scale,a.scale);if(a.dead){ctx.globalAlpha=Math.min(1,(1.6-a.age)/.6);const press=1-Math.pow(1-Math.min(1,a.age/.14),3);ctx.scale(1+.4*press,1-.63*press);}const p=a.phase,flat=a.dead;
+ function drawAnt(a,t){if(a.dead&&a.age>1.6)return;ctx.save();ctx.translate(a.x,a.y);ctx.rotate(a.angle);ctx.scale(size(a),size(a));if(a.dead){ctx.globalAlpha=Math.min(1,(1.6-a.age)/.6);const press=1-Math.pow(1-Math.min(1,a.age/.14),3);ctx.scale(1+.4*press,1-.63*press);}const p=a.phase,flat=a.dead;
 // 接地した細い脚を先に描き、三つの体節を重ねる。
 if(flat){ellipse(-3,0,29,13,'rgba(48,35,23,.16)');}ctx.shadowColor='rgba(44,31,11,.22)';ctx.shadowBlur=flat?0:3;ctx.shadowOffsetY=flat?0:2;
 for(let side of [-1,1])for(let i=0;i<3;i++){const phase=p+(i%2?Math.PI:0)+(side===1?Math.PI:0);const swing=flat?0:Math.sin(phase)*4;const lift=flat?0:Math.max(0,Math.cos(phase))*2;const rootX=3-i*4;const reach=[14,0,-15][i]*(flat?1.24:1);line([[rootX,side*3],[rootX+reach*.65+swing*.4,side*((flat?18:12)-lift)],[rootX+reach+swing,side*(23-lift)+(flat?side*11:0)]],1.25,'#342c22');line([[rootX+reach+swing,side*(23-lift)+(flat?side*11:0)],[rootX+reach+swing-2,side*(25-lift+(flat?11:0))]],.7,'#514333');}
@@ -139,7 +147,7 @@ for(const side of [-1,1]){const f=flat?0:Math.sin(t*(a.paused?6:3.7)+side*2+a.ph
 
  function drawRealLadybug(a,t){
 if(a.dead&&a.age>1.6)return;
-ctx.save();ctx.translate(a.x,a.y);ctx.rotate(a.angle);ctx.scale(a.scale,a.scale);
+ctx.save();ctx.translate(a.x,a.y);ctx.rotate(a.angle);ctx.scale(size(a),size(a));
 const flat=a.dead;
 if(flat){ctx.globalAlpha=Math.min(1,(1.6-a.age)/.6);const press=1-Math.pow(1-Math.min(1,a.age/.14),3);ctx.scale(1+.4*press,1-.63*press);}
 if(flat){ellipse(-3,0,27,18,'rgba(48,35,23,.16)');}ctx.shadowColor='rgba(49,33,15,.24)';ctx.shadowBlur=flat?0:4;ctx.shadowOffsetY=flat?0:3;
@@ -166,7 +174,7 @@ ctx.restore();
 
  function drawSpider(a,t){
 if(a.dead&&a.age>1.6)return;
-ctx.save();ctx.translate(a.x,a.y);ctx.rotate(a.angle);ctx.scale(a.scale,a.scale);
+ctx.save();ctx.translate(a.x,a.y);ctx.rotate(a.angle);ctx.scale(size(a),size(a));
 const flat=a.dead;
 if(flat){ctx.globalAlpha=Math.min(1,(1.6-a.age)/.6);const press=1-Math.pow(1-Math.min(1,a.age/.14),3);ctx.scale(1+.4*press,1-.63*press);}
 if(flat){ellipse(-4,0,29,15,'rgba(48,35,23,.16)');}ctx.shadowColor='rgba(35,25,15,.22)';ctx.shadowBlur=flat?0:3;ctx.shadowOffsetY=flat?0:2;
@@ -399,7 +407,7 @@ ctx.restore();
  function render(ms){
   const dt=clock===null?0:Math.min(.2,Math.max(0,(ms-clock)/1000));clock=ms;elapsed+=dt;
   for(const a of insects){
-   if(a.dead){a.age+=dt;}else if(lengths[kind]&&elapsed<=12){moveNew(a,dt);}else{
+   if(a.dead){a.age+=dt;}else if(newKinds.has(kind)&&elapsed<=12){moveNew(a,dt);}else{
     a.timer-=dt;
     if(a.timer<=0){a.paused=!a.paused;a.timer=a.paused?rnd(.2,kind==='spider'?1.3:.85):rnd(1.8,4.5);a.turn=rnd(-1.6,1.6);}
     if(elapsed>12){a.height=0;a.roll=0;a.paused=false;a.angle=a.x<W/2?Math.PI:0;a.targetSpeed=140;}
@@ -415,13 +423,30 @@ ctx.restore();
      }
     }
    }
-   if(lengths[kind])drawNew(a);else ({ant:drawAnt,ladybug:drawRealLadybug,spider:drawSpider})[kind](a,elapsed);
+   if(newKinds.has(kind))drawNew(a);else ({ant:drawAnt,ladybug:drawRealLadybug,spider:drawSpider})[kind](a,elapsed);
   }
   if(insects.every(a=>a.dead?a.age>1.6:a.x<-65||a.x>W+65)||elapsed>18)finish();
  }
  function touch(a,b){
-  const dx=b.x-a.x,dy=b.y-a.y,l=dx*dx+dy*dy;
-  for(const p of insects){if(p.dead)continue;const u=l?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-p.height-a.y)*dy)/l)):0;if(Math.hypot(p.x-a.x-u*dx,p.y-p.height-a.y-u*dy)<Math.max(25,(kind==='spider'?42:34)*size(p))){p.y-=p.height;p.height=0;p.dead=true;p.age=0;}}
+  for(const p of insects){
+   if(p.dead)continue;
+   const ratio=size(p);
+   const halfLength=Math.max(22,bodySizes[kind][1]*ratio/2+5);
+   const halfWidth=Math.max(17,Math.min(23,ratio*15));
+   const cos=Math.cos(p.angle),sin=Math.sin(p.angle);
+   const local=point=>{
+    const x=point.x-p.x,y=point.y-(p.y-p.height);
+    return {x:(x*cos+y*sin)/halfLength,y:(y*cos-x*sin)/halfWidth};
+   };
+   const from=local(a),to=local(b);
+   const dx=to.x-from.x,dy=to.y-from.y,distance=dx*dx+dy*dy;
+   const t=distance?Math.max(0,Math.min(1,-(from.x*dx+from.y*dy)/distance)):0;
+   if(Math.hypot(from.x+t*dx,from.y+t*dy)>1)continue;
+   p.y-=p.height;
+   p.height=0;
+   p.dead=true;
+   p.age=0;
+  }
  }
  return {get active(){return running},beginBatch,render,touch,resetClock(){clock=null}};
 }
