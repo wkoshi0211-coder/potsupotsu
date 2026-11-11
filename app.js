@@ -205,25 +205,25 @@ ctx.restore();
   a.pose=cycle;
   switch(kind){
    case 'grasshopper': {
-    const jump=Math.max(0,Math.min(1,(cycle-1.05)/.55));
+    const jump=Math.max(0,Math.min(1,(cycle-1.05)/.43));
     a.height=4*jump*(1-jump)*Math.min(W,H)*.085;
     a.crouch=cycle<1.05?Math.max(0,(cycle-.55)*2):Math.max(0,1-Math.abs(cycle-1.63)*10);
-    speed=jump>0&&jump<1?Math.min(W,H)*.42:cycle<.55?30:0;
+    speed=jump>0&&jump<1?Math.min(W,H)*.65:cycle<.48?62:0;
     break;
    }
    case 'dragonfly':
     a.height=Math.min(W,H)*(.06+.012*Math.sin(elapsed*5+a.offset));
-    speed=cycle<1.15?8:cycle<2.1?155*Math.sin(Math.PI*(cycle-1.15)/.95):16;
+    speed=cycle<1.15?0:cycle<1.85?290*Math.sin(Math.PI*(cycle-1.15)/.70):0;
     break;
    case 'mantis':
-    speed=cycle>1.2?33:0;
+    speed=cycle>1.3&&cycle<2.55?66:0;
     break;
    case 'pillbug':
     a.roll=Math.max(0,Math.min(1,(cycle-1.4)*4,(2.9-cycle)*4));
-    speed=30*(1-a.roll);
+    speed=cycle<1.25?63:0;
     break;
    case 'caterpillar':
-    speed=cycle<2.6?23*(.65+.35*Math.sin(a.gait)):0;
+    speed=cycle<1.8?52*(.7+.3*Math.sin(a.gait)):0;
     break;
   }
   const margin=Math.min(W,H)*.14;
@@ -236,12 +236,13 @@ ctx.restore();
   }
   a.x+=Math.cos(a.angle)*speed*dt;
   a.y+=Math.sin(a.angle)*speed*dt;
-  a.gait+=dt*(kind==='caterpillar'?5:speed*.35);
+  a.gait+=dt*(kind==='caterpillar'?(speed>0?9:0):speed*.35);
  }
 
  function shell(x,y,rx,ry,light,dark,angle=0){
   const gradient=ctx.createRadialGradient(x-rx*.28,y-ry*.45,0,x,y,Math.max(rx,ry));
   gradient.addColorStop(0,light);
+  gradient.addColorStop(.48,light);
   gradient.addColorStop(1,dark);
   ellipse(x,y,rx,ry,gradient,angle);
  }
@@ -268,7 +269,17 @@ ctx.restore();
   }
   shell(-7,0,23,6,'#a4b35b','#475a2d');
   shell(10,0,10,7,'#99aa57','#566c32');
-  line([[-27,1],[-6,-4],[13,-2]],1,'#c3c479');
+  line([[-28,1],[-6,-4],[13,-2]],.85,'#d5c685');
+  for(let i=0;i<8;i++){
+   const x=-25+i*4;
+   line([[x,-.5],[x+4,-4]],.55,'rgba(53,68,30,.65)');
+   line([[x,1],[x+4,3]],.55,'rgba(204,189,111,.58)');
+  }
+  for(const side of [-1,1])for(let j=0;j<4;j++){
+   const x=-21+j*3;
+   line([[x,side*15],[x-2,side*18]],.7,'#3b4929');
+  }
+  ellipse(24,-3,.65,.55,'#ece5bd');
   shell(21,0,7,6,'#c1c884','#68733c');
   ellipse(23,-3,2.3,1.7,'#303925');
   feelers(18,'#646b3a',a.dead?0:elapsed*4+a.offset);
@@ -279,7 +290,12 @@ ctx.restore();
    ctx.save();ctx.translate(x,0);ctx.rotate(side*(x<0?.38:.15));
    ellipse(0,side*21*flutter,5,22*flutter,'rgba(219,241,235,.73)');
    line([[0,0],[0,side*41*flutter]],.9,'rgba(53,98,91,.62)');
-   for(let j=1;j<=4;j++)line([[0,side*j*8*flutter],[3,side*(j*8+4)*flutter]],.55,'rgba(62,114,106,.45)');
+   for(let j=1;j<=8;j++){
+   const y=j*4.5*flutter;
+   line([[-3.6,side*(y+2)],[0,side*y],[3.5,side*(y+2.7)]],.46,'rgba(56,91,81,.66)');
+   if(j>1)line([[2,side*y],[2,side*(y-4)]],.35,'rgba(56,91,81,.56)');
+  }
+  ellipse(2,side*35*flutter,1.35,2.8,'rgba(81,53,36,.7)');
    ctx.restore();
   }
   legs(a,3,1,9,'#333e3c');
@@ -292,12 +308,19 @@ ctx.restore();
  function mantis(a){
   legs(a,2,1.5,20,'#5c7838');
   shell(-11,0,18,5,'#afba65','#4f7437');
-  line([[-25,0],[4,0]],.8,'#ccd58c');
+  line([[-25,0],[4,0]],.7,'#d7da98');
+  for(const side of [-1,1])for(let j=0;j<7;j++){
+   const x=-23+j*3.5;
+   line([[x,0],[x+5,side*3.8]],.46,'rgba(59,89,33,.7)');
+  }
   shell(11,0,13,2.7,'#98af60','#4d713a');
   for(const side of [-1,1]){
    const lift=a.dead?0:Math.max(0,Math.sin((a.pose||0)*2.3+side));
    line([[15,side*2],[18+lift*6,side*10],[27,side*(5+lift*3)],[20,side*6]],2.2,'#688a40');
-   line([[26,side*6],[22,side*8]],.8,'#344d27');
+   for(let j=0;j<4;j++){
+   const x=22+j*1.35;
+   line([[x,side*(6+lift)],[x-1,side*(8+lift)]],.65,'#344d27');
+  }
   }
   ctx.save();ctx.translate(24,0);ctx.rotate(a.dead?0:Math.sin(elapsed*3+a.offset)*.34);
   ctx.beginPath();ctx.moveTo(-3,0);ctx.lineTo(3,-7);ctx.lineTo(5,7);ctx.closePath();ctx.fillStyle='#9bac5c';ctx.fill();
@@ -314,20 +337,29 @@ ctx.restore();
   for(let i=0;i<9;i++){
    const x=-23+i*5.8;
    const radius=8+5*Math.sin(Math.PI*i/8);
-   shell(x,0,5.5,radius,'#8c8982','#414044');
+   shell(x,0,5.5,radius,'#817d75','#27282b');
+   for(const side of [-1,1]){
+    line([[x-1,side*radius*.38],[x,side*radius*.76],[x+1,side*radius*.91]],.65,'rgba(211,202,180,.43)');
+    ellipse(x+1,side*radius*.61,.55,.42,'#413e38');
+   }
    line([[x-2,-radius*.74],[x-3,0],[x-2,radius*.74]],.95,'#444348');
   }
   if(roll<.65)feelers(10,'#595650',a.dead?0:elapsed*4+a.offset);
  }
  function caterpillar(a){
   const cycle=a.dead?0:a.gait;
-  const spacing=4.7+.9*Math.sin(cycle);
+  const spacing=4.65+1.05*Math.sin(cycle);
   for(let i=0;i<10;i++){
    const x=(i-4.5)*spacing;
-   const bend=a.dead?0:Math.sin(i*.55-cycle)*1.65;
+   const bend=a.dead?0:Math.sin(i*.72-cycle)*2.4;
    const width=5.2+1.5*Math.sin(Math.PI*i/9);
    if(i<5||i>6)for(const side of [-1,1])ellipse(x+1,bend+side*(width-1),1.75,2.5,'#697e39');
-   shell(x,bend,5.1,width,'#bdce79','#66883d');
+   shell(x,bend,5.1,width,'#bdd479','#527039');
+   for(const side of [-1,1]){
+    ellipse(x-1.2,bend+side*width*.68,.85,.62,'#e6dba1');
+    ellipse(x-1,bend+side*width*.70,.42,.35,'#4e4e2a');
+   }
+   if(i>1&&i<7)line([[x-2,bend-width*.73],[x+.4,bend],[x-2,bend+width*.73]],.85,'rgba(47,77,41,.65)');
    if(i===7){ellipse(x,bend-3,2.6,1.8,'#444d32');ellipse(x,bend+3,2.6,1.8,'#444d32');}
   }
   const raise=!a.dead&&a.pose>2.6?Math.sin((a.pose-2.6)*7)*3:0;
