@@ -198,39 +198,39 @@ ctx.restore();
 }
 
  function moveNew(a,dt){
-  const cycle=(elapsed+a.offset)%3;
+  const cycle=(elapsed+a.offset)%4;
   let speed=0;
   a.height=0;
   a.roll=0;
   a.pose=cycle;
   switch(kind){
    case 'grasshopper': {
-    const jump=Math.max(0,Math.min(1,(cycle-1.05)/.43));
+    const jump=Math.max(0,Math.min(1,(cycle-1.05)/.66));
     a.height=4*jump*(1-jump)*Math.min(W,H)*.085;
     a.crouch=cycle<1.05?Math.max(0,(cycle-.55)*2):Math.max(0,1-Math.abs(cycle-1.63)*10);
-    speed=jump>0&&jump<1?Math.min(W,H)*.65:cycle<.48?62:0;
+    speed=jump>0&&jump<1?Math.min(W,H)*.92:cycle<.48?62:0;
     break;
    }
    case 'dragonfly':
     a.height=Math.min(W,H)*(.06+.012*Math.sin(elapsed*5+a.offset));
-    speed=cycle<1.15?0:cycle<1.85?290*Math.sin(Math.PI*(cycle-1.15)/.70):0;
+    speed=cycle<1.15?0:cycle<2.75?Math.min(W,H)*.68*Math.sin(Math.PI*(cycle-1.15)/1.60):0;
     break;
    case 'mantis':
-    speed=cycle>1.3&&cycle<2.55?66:0;
+    speed=cycle>1.15&&cycle<3.25?Math.min(W,H)*.19:0;
     break;
    case 'pillbug':
-    a.roll=Math.max(0,Math.min(1,(cycle-1.4)*4,(2.9-cycle)*4));
-    speed=cycle<1.25?63:0;
+    a.roll=Math.max(0,Math.min(1,(cycle-2.25)*4,(3.9-cycle)*4));
+    speed=cycle<2.1?Math.min(W,H)*.17:0;
     break;
    case 'caterpillar':
-    speed=cycle<1.8?52*(.7+.3*Math.sin(a.gait)):0;
+    speed=cycle<2.55?Math.min(W,H)*.18*(.7+.3*Math.sin(a.gait)):0;
     break;
   }
   const margin=Math.min(W,H)*.14;
-  if(a.x<margin||a.x>W-margin||a.y<margin||a.y>H-margin){
+  if(speed>0&&(a.x<margin||a.x>W-margin||a.y<margin||a.y>H-margin)){
    const target=Math.atan2(H/2-a.y,W/2-a.x);
    const turn=Math.atan2(Math.sin(target-a.angle),Math.cos(target-a.angle));
-   a.angle+=turn*Math.min(1,dt*8);
+   a.angle+=turn*Math.min(1,dt*12);
   }else if(speed>0){
    a.angle+=dt*a.turn*(kind==='dragonfly'?1.35:.48);
   }
