@@ -311,8 +311,8 @@ ctx.restore();
  }
  function dragonfly(a){
   const flutter=a.dead?.95:.72+.28*Math.sin(elapsed*74+a.offset);
-  for(const side of [-1,1])for(const x of [-8,4]){
-   ctx.save();ctx.translate(x,0);ctx.rotate(side*(x<0?.38:.15));
+  for(const side of [-1,1])for(const x of [7,14]){
+   ctx.save();ctx.translate(x,side*3);ctx.rotate(side*(x===7?.38:.15));
    ellipse(0,side*21*flutter,5,22*flutter,'rgba(219,241,235,.73)');
    line([[0,0],[0,side*41*flutter]],.9,'rgba(53,98,91,.62)');
    for(let j=1;j<=8;j++){
