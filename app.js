@@ -276,13 +276,30 @@ ctx.restore();
    line([[-15,side*3],[knee,side*12]],4.4,'#879349');
   }
   shell(-7,0,23,6,'#a4b35b','#475a2d');
-  shell(10,0,10,7,'#99aa57','#566c32');
-  line([[-28,1],[-6,-4],[13,-2]],.85,'#d5c685');
-  for(let i=0;i<8;i++){
-   const x=-25+i*4;
-   line([[x,-.5],[x+4,-4]],.55,'rgba(53,68,30,.65)');
-   line([[x,1],[x+4,3]],.55,'rgba(204,189,111,.58)');
+  // The two folded forewings meet behind the pronotum and cover the abdomen.
+  for(const side of [-1,1]){
+   ctx.save();
+   ctx.translate(8,side*3.5);
+   ctx.rotate(side*.1);
+   ctx.beginPath();
+   ctx.moveTo(0,0);
+   ctx.quadraticCurveTo(-7,side*4,-21,side*2.8);
+   ctx.quadraticCurveTo(-31,side*1,-37,side*.4);
+   ctx.quadraticCurveTo(-23,-side*4,-7,-side*3);
+   ctx.quadraticCurveTo(-2,-side*3,0,0);
+   const wing=ctx.createRadialGradient(-12,0,0,-12,0,23);
+   wing.addColorStop(0,'#576736');
+   wing.addColorStop(.5,'#a8ab65');
+   wing.addColorStop(1,'#596935');
+   ctx.fillStyle=wing;ctx.fill();
+   line([[0,0],[-12,0],[-34,side*.4]],.65,'#c4bc7a');
+   for(let j=0;j<6;j++){
+    const x=-7-j*4;
+    line([[x,0],[x-4,side*(3-j*.36)]],.45,'rgba(54,70,32,.65)');
+   }
+   ctx.restore();
   }
+  shell(12,0,7,7,'#99aa57','#566c32');
   for(const side of [-1,1])for(let j=0;j<4;j++){
    const x=-21+j*3;
    line([[x,side*15],[x-2,side*18]],.7,'#3b4929');
@@ -340,19 +357,41 @@ ctx.restore();
  }
  function pillbug(a){
   const roll=a.dead?0:a.roll;
-  ctx.scale(1-roll*.28,1+roll*.28);
-  if(roll<.85)legs(a,7,1.2,13*(1-roll*.55),'#655d55');
-  for(let i=0;i<9;i++){
-   const x=-23+i*5.8;
-   const radius=8+5*Math.sin(Math.PI*i/8);
-   shell(x,0,5.5,radius,'#817d75','#27282b');
-   for(const side of [-1,1]){
-    line([[x-1,side*radius*.38],[x,side*radius*.76],[x+1,side*radius*.91]],.65,'rgba(211,202,180,.43)');
-    ellipse(x+1,side*radius*.61,.55,.42,'#413e38');
+  const tuck=roll*roll*(3-2*roll);
+  const blend=(open,closed)=>open+(closed-open)*tuck;
+  // Legs start underneath their own plates and tuck into the shell.
+  if(tuck<.96){
+   for(const side of [-1,1])for(let i=0;i<7;i++){
+    const x=blend(-17+i*5.8,(-17+i*5.8)*.5);
+    const stride=Math.sin(a.gait+i*Math.PI+(side===1?Math.PI:0))*2.4;
+    const reach=(1-tuck)*4.5;
+    line([[x,side*6],[x+stride+1,side*(11+reach)],[x+stride-2,side*(12+reach)]],1.35,'#554f48');
    }
-   line([[x-2,-radius*.74],[x-3,0],[x-2,radius*.74]],.95,'#444348');
   }
-  if(roll<.65)feelers(10,'#595650',a.dead?0:elapsed*4+a.offset);
+  if(tuck<.65){
+   for(const side of [-1,1]){
+    const sway=a.dead?0:Math.sin(elapsed*4+a.offset+side);
+    const head=blend(23,13);
+    line([[head,side*3],[head+5,side*5],[head+9,side*(6+sway)]],.9,'#595650');
+   }
+  }
+  const rx=blend(28.5,17),ry=blend(13,16.5);
+  shell(0,0,rx,ry,'#99938a','#29282d');
+  ctx.save();
+  ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);ctx.clip();
+  for(let i=1;i<=8;i++){
+   const u=i/9*2-1;
+   const x=u*rx;
+   const y=ry*Math.sqrt(1-u*u);
+   const curve=blend(1.3,4.5);
+   ctx.beginPath();ctx.moveTo(x,-y);
+   ctx.quadraticCurveTo(x-curve,0,x,y);
+   ctx.lineWidth=1.2;ctx.strokeStyle='#454348';ctx.stroke();
+   ctx.beginPath();ctx.moveTo(x+1,-y);
+   ctx.quadraticCurveTo(x+1-curve,0,x+1,y);
+   ctx.lineWidth=.55;ctx.strokeStyle='rgba(208,197,177,.5)';ctx.stroke();
+  }
+  ctx.restore();
  }
  function caterpillar(a){
   const cycle=a.dead?0:a.gait;
